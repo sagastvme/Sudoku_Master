@@ -1,80 +1,64 @@
-function main() {
-    const sudokuMatrix = [
-      [7, 5, 0, 0, 0, 9, 0, 4, 0],
-      [0, 9, 0, 0, 0, 0, 0, 0, 0],
-      [0, 0, 0, 0, 0, 0, 0, 0, 0],
-      [8, 0, 0, 0, 0, 0, 0, 0, 0],
-      [0, 0, 0, 0, 0, 0, 0, 0, 0],
-      [0, 2, 0, 0, 0, 0, 0, 0, 6],
-      [0, 0, 0, 0, 0, 0, 0, 0, 0],
-      [0, 0, 0, 7, 0, 0, 0, 0, 0],
-      [9, 0, 0, 0, 0, 0, 0, 0, 0],
-    ];
-  
-    if (solveSudoku(sudokuMatrix)) {
-      console.log('Solved:');
-      printSudoku(sudokuMatrix);
-    } else {
-      console.log('No solution found.');
+const { markRaw } = require("vue");
+const { solveSudoku, printSudoku } = require("./resolve");
+
+let matrix = [
+  [0, 0, 0, 0, 0, 0, 0, 0, 0],
+  [0, 0, 0, 0, 0, 0, 0, 0, 0],
+  [0, 0, 0, 0, 0, 0, 0, 0, 0],
+  [0, 0, 0, 0, 0, 0, 0, 0, 0],
+  [0, 0, 0, 0, 0, 0, 0, 0, 0],
+  [0, 0, 0, 0, 0, 0, 0, 0, 0],
+  [0, 0, 0, 0, 0, 0, 0, 0, 0],
+  [0, 0, 0, 0, 0, 0, 0, 0, 0],
+  [0, 0, 0, 0, 0, 0, 0, 0, 0],
+];
+
+function createSudoku() {
+  let numbers = [1, 2, 3, 4, 5, 6, 7, 8, 9];
+  for (let x = 3; x < 6; x++) {
+    for (let y = 3; y < 6; y++) {
+        let randomNumberIndex = getRandomIntInclusive(0, numbers.length - 1);
+        let randomNumber = numbers[randomNumberIndex];
+        numbers.splice(randomNumberIndex, 1); // Remove the chosen number from the array
+        matrix[x][y] = randomNumber; // Assign the removed number to matrix[x][y]
     }
   }
-  
-  function solveSudoku(sudokuMatrix) {
-    for (let xAxis = 0; xAxis < 9; xAxis++) {
-      for (let yAxis = 0; yAxis < 9; yAxis++) {
-        if (sudokuMatrix[xAxis][yAxis] === 0) {
-          const options = areaToAnalyze(xAxis, yAxis, sudokuMatrix);
-          for (const number of options) {
-            sudokuMatrix[xAxis][yAxis] = number;
-            if (solveSudoku(sudokuMatrix)) {
-              return true;
-            }
-            sudokuMatrix[xAxis][yAxis] = 0;
-          }
-          return false;
+  if (solveSudoku(matrix)) {
+    console.log('solved');
+    printSudoku(matrix);
+prepareSudoku(matrix, 'easy')
+console.log('empty');
+    printSudoku(matrix);
+    if(solveSudoku(matrix)){
+        console.log('solved');
+        printSudoku(matrix)
+    }
+  } else {
+    console.log('No solution found.');
+  }
+}
+
+function getRandomIntInclusive(min, max) {
+  const minCeiled = Math.ceil(min);
+  const maxFloored = Math.floor(max);
+  return Math.floor(Math.random() * (maxFloored - minCeiled + 1) + minCeiled); // The maximum is inclusive and the minimum is inclusive
+}
+
+function prepareSudoku(sudokuMatrix, difficulty){
+    let cellsDeleted={
+        'easy':40, 'medium':45, 'hard':50, 'expert':56
+    }
+    let i = 0 ;
+    chosenCells = cellsDeleted[difficulty]
+    console.log('chosen cells ', chosenCells)
+    while(i<cellsDeleted[difficulty]){
+        let x = getRandomIntInclusive(0,8)
+        let y = getRandomIntInclusive(0,8)
+        if(sudokuMatrix[x][y]!==0){
+            sudokuMatrix[x][y]=0;
+            i++
         }
-      }
-    }
-    return true; 
-  }
-  
-  function areaToAnalyze(xAxis, yAxis, sudokuMatrix) {
-    const usedNumbers = new Set();
-  
-    // Check row
-    for (let i = 0; i < 9; i++) {
-      usedNumbers.add(sudokuMatrix[xAxis][i]);
-    }
-  
-    // Check column
-    for (let i = 0; i < 9; i++) {
-      usedNumbers.add(sudokuMatrix[i][yAxis]);
-    }
-  
-    // Check 3x3 square
-    const startX = Math.floor(xAxis / 3) * 3;
-    const startY = Math.floor(yAxis / 3) * 3;
-    for (let i = startX; i < startX + 3; i++) {
-      for (let j = startY; j < startY + 3; j++) {
-        usedNumbers.add(sudokuMatrix[i][j]);
-      }
-    }
-  
-    const options = [];
-    for (let num = 1; num <= 9; num++) {
-      if (!usedNumbers.has(num)) {
-        options.push(num);
-      }
-    }
-  
-    return options;
-  }
-  
-  function printSudoku(sudokuMatrix) {
-    for (const row of sudokuMatrix) {
-      console.log(row.join(' '));
     }
   }
-  
-  main();
-  
+
+createSudoku();
